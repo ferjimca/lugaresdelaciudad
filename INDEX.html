@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Ciudad y las Direcciones - ELE A2</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#08265D',
+                        corpBlue: '#0074BA',
+                        cyanBlue: '#00BBDC',
+                        elecBlue: '#0866D9',
+                        lightBlue: '#EEF8FC',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Animaciones para volteo de tarjetas */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        /* Transición suave para tarjeta */
+        .card-inner {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Reducción de movimiento si el usuario lo prefiere */
+        @media (prefers-reduced-motion: reduce) {
+            .card-inner {
+                transition: none !important;
+            }
+            .animate-bounce, .animate-pulse {
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-lightBlue text-slate-800 font-sans min-h-screen flex flex-col justify-between selection:bg-cyanBlue selection:text-white">
+
+    <!-- Encabezado / Header -->
+    <header class="bg-navy text-white shadow-md border-b-4 border-cyanBlue">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-corpBlue p-2 rounded-lg text-2xl" aria-hidden="true">🏙️</div>
+                <div>
+                    <h1 class="text-xl font-bold leading-tight">Mi Ciudad y las Direcciones</h1>
+                    <p class="text-xs text-cyanBlue font-medium">Español Nivel A2 • Windward Learning</p>
+                </div>
+            </div>
+            <!-- Indicador de Fase / Nivel -->
+            <div class="hidden sm:flex items-center bg-white/10 px-3 py-1.5 rounded-full text-xs font-semibold">
+                <span id="header-phase-tag" class="text-cyanBlue">Fase 1: Vocabulario</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Barra de Navegación entre Actividades (Flechas) -->
+    <nav aria-label="Navegación de actividades" class="max-w-4xl mx-auto w-full px-4 pt-4 flex justify-between items-center">
+        <button id="nav-btn-prev" onclick="navigatePhase(-1)" class="bg-white hover:bg-slate-100 text-navy font-bold py-2 px-4 rounded-xl border border-slate-200 shadow-sm transition-all flex items-center space-x-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyanBlue disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white" disabled>
+            <span>⬅️</span>
+            <span>Anterior (Previous)</span>
+        </button>
+        
+        <!-- Indicador visual de los pasos / fases -->
+        <div class="flex items-center space-x-1 sm:space-x-2 text-xs font-semibold text-slate-500">
+            <span id="dot-1" class="w-3 h-3 rounded-full bg-cyanBlue transition-all"></span>
+            <span id="dot-2" class="w-3 h-3 rounded-full bg-slate-300 transition-all"></span>
+            <span id="dot-3" class="w-3 h-3 rounded-full bg-slate-300 transition-all"></span>
+            <span id="dot-4" class="w-3 h-3 rounded-full bg-slate-300 transition-all"></span>
+        </div>
+
+        <button id="nav-btn-next" onclick="navigatePhase(1)" class="bg-white hover:bg-slate-100 text-navy font-bold py-2 px-4 rounded-xl border border-slate-200 shadow-sm transition-all flex items-center space-x-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyanBlue disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white">
+            <span>Siguiente (Next)</span>
+            <span>➡️</span>
+        </button>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow flex items-center justify-center p-4 max-w-4xl mx-auto w-full">
+
+        <!-- PANTALLA 1: INICIO Y ACTIVACIÓN DE CONOCIMIENTOS -->
+        <section id="screen-intro" class="w-full bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-150 transition-all">
+            <div class="text-center max-w-2xl mx-auto space-y-6">
+                <div class="inline-block p-4 bg-lightBlue rounded-full text-5xl mb-2 animate-bounce">
+                    🗺️
+                </div>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-navy">¡Bienvenido a la Ciudad!</h2>
+                <p class="text-slate-600 text-sm md:text-base leading-relaxed">
+                    Aprenderás a identificar los lugares más importantes de la ciudad y a dar instrucciones simples para orientarte (girar a la derecha, a la izquierda, seguir derecho).
+                </p>
+
+                <!-- Cuadro de Apoyo Lingüístico -->
+                <div class="bg-lightBlue p-4 rounded-xl border border-cyanBlue/30 text-left text-xs md:text-sm text-navy space-y-2">
+                    <div class="font-bold flex items-center text-corpBlue">
+                        <span class="mr-2">💡</span> Instructions Support / Apoyo de instrucciones:
+                    </div>
+                    <ul class="list-disc list-inside space-y-1 text-slate-700">
+                        <li><strong>Fase 1:</strong> Revisa y repasa las tarjetas (Flashcards).</li>
+                        <li><strong>Fase 2:</strong> Completa el Desafío de Rutas en el mapa.</li>
+                        <li><strong>Fase 3:</strong> Autoevaluación y Reflexión final.</li>
+                    </ul>
+                </div>
+
+                <div class="pt-4">
+                    <button id="btn-start-app" onclick="startLesson()" class="w-full sm:w-auto bg-corpBlue hover:bg-navy text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-cyanBlue text-lg">
+                        ¡Comenzar la Lección! 🚀
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANTALLA 2: FLASHCARDS INTERACTIVAS -->
+        <section id="screen-flashcards" class="w-full bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-slate-150 hidden">
+            <!-- Barra de Progreso y Marcadores -->
+            <div class="mb-6 space-y-2">
+                <div class="flex justify-between items-center text-xs sm:text-sm font-semibold text-navy">
+                    <span id="flashcard-progress-text">Tarjeta 1 de 10</span>
+                    <span id="flashcard-score-text" class="text-corpBlue">Aprendidas: 0</span>
+                </div>
+                <div class="w-full bg-slate-150 rounded-full h-3 overflow-hidden bg-slate-100 border border-slate-200">
+                    <div id="flashcard-progress-bar" class="bg-cyanBlue h-full transition-all duration-300 w-0"></div>
+                </div>
+            </div>
+
+            <!-- Contenedor Flip Card -->
+            <div class="perspective-1000 w-full max-w-md mx-auto h-72 sm:h-80 cursor-pointer mb-6" id="card-container" onclick="flipCard()" tabindex="0" role="button" aria-label="Tarjeta interactiva. Haz clic o presiona Enter para voltear.">
+                <div id="card-inner" class="card-inner relative w-full h-full transform-style-3d rounded-2xl shadow-lg border-2 border-slate-200 bg-white">
+                    
+                    <!-- FRENTE DE LA TARJETA (Pregunta/Pictograma) -->
+                    <div class="backface-hidden absolute inset-0 w-full h-full flex flex-col justify-between p-6 bg-gradient-to-b from-white to-lightBlue rounded-2xl">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-corpBlue bg-lightBlue px-2.5 py-1 rounded-md border border-cyanBlue/20" id="card-category">Lugar</span>
+                            <span class="text-xs text-slate-400">Toca para revelar 🔄</span>
+                        </div>
+                        <div class="text-center my-auto">
+                            <div id="card-icon-front" class="text-6xl sm:text-7xl mb-3">🏫</div>
+                            <p id="card-hint-front" class="text-sm font-medium text-slate-500">¿Qué lugar es este?</p>
+                            <p id="card-english-hint" class="text-xs text-slate-400 italic mt-1">(What place is this?)</p>
+                        </div>
+                        <div class="text-center text-xs font-semibold text-corpBlue">
+                            Haz clic para ver la respuesta 👆
+                        </div>
+                    </div>
+
+                    <!-- REVERSO DE LA TARJETA (Respuesta en Español) -->
+                    <div class="backface-hidden rotate-y-180 absolute inset-0 w-full h-full flex flex-col justify-between p-6 bg-navy text-white rounded-2xl">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-cyanBlue bg-white/10 px-2.5 py-1 rounded-md" id="card-category-back">Respuesta</span>
+                            <span class="text-xs text-white/60">Español A2</span>
+                        </div>
+                        <div class="text-center my-auto space-y-2">
+                            <div id="card-icon-back" class="text-5xl mb-1">🏫</div>
+                            <h3 id="card-word-spanish" class="text-2xl sm:text-3xl font-extrabold text-cyanBlue">La escuela</h3>
+                            <p id="card-word-english" class="text-xs text-white/70 italic">(The school)</p>
+                            <p id="card-sentence-example" class="text-xs sm:text-sm bg-white/10 p-2.5 rounded-lg text-lightBlue mt-2">
+                                "La escuela está cerca del parque."
+                            </p>
+                        </div>
+                        <div class="text-center text-xs text-white/50">
+                            ¿Cómo te fue con esta palabra?
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Botones de Autoevaluación (Visibles tras voltear o siempre activos para facilidad) -->
+            <div id="card-controls" class="flex flex-col sm:flex-row justify-center items-center gap-3 max-w-md mx-auto">
+                <button onclick="evaluateCard(false)" class="w-full sm:w-1/2 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 focus:ring-2 focus:ring-amber-400">
+                    <span>🔁</span>
+                    <span>Repasar (Review)</span>
+                </button>
+                <button onclick="evaluateCard(true)" class="w-full sm:w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 focus:ring-2 focus:ring-emerald-400">
+                    <span>✅</span>
+                    <span>¡Lo sé! (I know it!)</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA 3: PRÁCTICA INDEPENDIENTE - DESAFÍO DE RUTAS -->
+        <section id="screen-game" class="w-full bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-slate-150 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-navy">Desafío de Ruta (Route Challenge)</h2>
+                    <p class="text-xs text-slate-500">Lee la instrucción y selecciona la acción o dirección correcta.</p>
+                </div>
+                <span id="game-step-badge" class="bg-lightBlue text-corpBlue border border-cyanBlue/30 text-xs font-bold px-3 py-1 rounded-full">Reto 1/4</span>
+            </div>
+
+            <!-- Mapa Simulado Interactivo -->
+            <div class="bg-slate-100 rounded-xl p-4 border border-slate-300 mb-6 text-center">
+                <div class="text-xs text-slate-500 mb-2 font-semibold">MAPA DE LA CIUDAD DE ESPAÑOL</div>
+                <div class="grid grid-cols-3 gap-2 max-w-xs mx-auto text-2xl sm:text-3xl p-2 bg-white rounded-lg shadow-inner">
+                    <div class="p-2 border rounded bg-lightBlue" title="Hospital">🏥</div>
+                    <div class="p-2 border rounded bg-lightBlue" title="Supermercado">🛒</div>
+                    <div class="p-2 border rounded bg-lightBlue" title="Biblioteca">📚</div>
+                    <div class="p-2 border rounded bg-lightBlue" title="Escuela">🏫</div>
+                    <div id="map-player" class="p-2 border-2 border-elecBlue rounded bg-cyanBlue/20 animate-pulse" title="Tú estás aquí">🚗</div>
+                    <div class="p-2 border rounded bg-lightBlue" title="Parque">🌳</div>
+                </div>
+            </div>
+
+            <!-- Situación / Pregunta -->
+            <div class="bg-lightBlue p-4 rounded-xl border border-cyanBlue/30 mb-6">
+                <p id="game-question-text" class="text-base sm:text-lg font-bold text-navy text-center">
+                    "Estás frente a la escuela. ¿Cómo vas hacia la derecha?"
+                </p>
+                <p id="game-question-en" class="text-xs text-slate-500 text-center italic mt-1">
+                    (How do you turn right?)
+                </p>
+            </div>
+
+            <!-- Opciones de Respuesta -->
+            <div id="game-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                <!-- Se generan dinámicamente -->
+            </div>
+
+            <!-- Area de Feedback Inmediato -->
+            <div id="game-feedback" class="hidden p-3 rounded-lg text-sm text-center font-medium"></div>
+        </section>
+
+        <!-- PANTALLA 4: RESULTADOS Y REFLEXIÓN FINAL -->
+        <section id="screen-results" class="w-full bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-150 hidden text-center">
+            <div class="inline-block p-4 bg-lightBlue rounded-full text-5xl mb-4">
+                🏆
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-navy mb-2">¡Excelente Trabajo!</h2>
+            <p class="text-sm text-slate-600 mb-6">Has completado la unidad de "Mi Ciudad y las Direcciones".</p>
+
+            <!-- Desglose de Desempeño -->
+            <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto mb-6">
+                <div class="bg-lightBlue p-4 rounded-xl border border-cyanBlue/20">
+                    <span class="block text-2xl font-bold text-corpBlue" id="res-cards-score">100%</span>
+                    <span class="text-xs text-slate-600 font-medium">Tarjetas Dominadas</span>
+                </div>
+                <div class="bg-lightBlue p-4 rounded-xl border border-cyanBlue/20">
+                    <span class="block text-2xl font-bold text-corpBlue" id="res-game-score">4/4</span>
+                    <span class="text-xs text-slate-600 font-medium">Rutero Correcto</span>
+                </div>
+            </div>
+
+            <!-- Actividad de Transferencia Comunicativa -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-left text-xs sm:text-sm text-slate-700 mb-6 space-y-2">
+                <h3 class="font-bold text-navy text-base flex items-center">
+                    <span class="mr-2">📝</span> Actividad de Transferencia (Final Task):
+                </h3>
+                <p>Escribe 2 oraciones sencillas sobre tu ciudad real en tu libreta o para tu profesor:</p>
+                <div class="bg-white p-3 rounded border border-slate-300 font-mono text-xs text-slate-600">
+                    Ejemplo: <em>"En mi ciudad, la escuela está cerca del parque. Para ir a mi casa, giro a la derecha."</em>
+                </div>
+            </div>
+
+            <!-- Botón de Reinicio -->
+            <button onclick="resetApp()" class="bg-corpBlue hover:bg-navy text-white font-bold py-3 px-8 rounded-xl shadow-md transition-all focus:ring-4 focus:ring-cyanBlue">
+                🔄 Intentar de nuevo (Restart)
+            </button>
+        </section>
+
+    </main>
+
+    <!-- Pie de página / Footer -->
+    <footer class="bg-navy text-white/60 text-xs py-3 text-center border-t border-corpBlue/30">
+        <p>Material Educativo ELE A2 • Método TBLT & Gamificación • Sin dependencias externas</p>
+    </footer>
+
+    <!-- LOGICA JAVASCRIPT PURO -->
+    <script>
+        // BD de Vocabulario y Preguntas (Guiado y Aprobado)
+        const flashcardsData = [
+            { category: "Lugar", icon: "🏫", word: "La escuela", english: "The school", example: "La escuela es grande." },
+            { category: "Lugar", icon: "📚", word: "La biblioteca", english: "The library", example: "Estudio en la biblioteca." },
+            { category: "Lugar", icon: "🏥", word: "El hospital", english: "The hospital", example: "El hospital está cerca." },
+            { category: "Lugar", icon: "🛒", word: "El supermercado", english: "The supermarket", example: "Compro comida en el supermercado." },
+            { category: "Lugar", icon: "🌳", word: "El parque", english: "The park", example: "Camino por el parque." },
+            { category: "Lugar", icon: "🚌", word: "La estación de autobuses", english: "The bus station", example: "Tomo el autobús aquí." },
+            { category: "Dirección", icon: "➡️", word: "Gira a la derecha", english: "Turn right", example: "En la esquina, gira a la derecha." },
+            { category: "Dirección", icon: "⬅️", word: "Gira a la izquierda", english: "Turn left", example: "Gira a la izquierda en el parque." },
+            { category: "Dirección", icon: "⬆️", word: "Ve recto / Sigue derecho", english: "Go straight", example: "Sigue derecho dos cuadras." },
+            { category: "Dirección", icon: "🚸", word: "Cruza la calle", english: "Cross the street", example: "Cruza la calle con cuidado." }
+        ];
+
+        const gameQuestions = [
+            {
+                text: "Quieres ir a la biblioteca. La indicación dice: ➡️. ¿Qué debes hacer?",
+                english: "(You want to go to the library. The sign says ➡️. What should you do?)",
+                options: [
+                    { text: "Gira a la derecha", correct: true, explain: "¡Exacto! ➡️ significa gira a la derecha." },
+                    { text: "Gira a la izquierda", correct: false, explain: "Incorrecto. ➡️ es hacia la derecha." },
+                    { text: "Sigue derecho", correct: false, explain: "Incorrecto. ➡️ no es seguir recto." }
+                ]
+            },
+            {
+                text: "Estás caminando y ves el cartel: ⬆️. ¿Cuál es la instrucción correcta?",
+                english: "(You are walking and see the sign: ⬆️. What is the correct instruction?)",
+                options: [
+                    { text: "Cruza la calle", correct: false, explain: "Incorrecto. 🚸 es cruzar la calle." },
+                    { text: "Ve recto / Sigue derecho", correct: true, explain: "¡Bien hecho! ⬆️ significa ir recto." },
+                    { text: "Gira a la izquierda", correct: false, explain: "Incorrecto. ⬆️ es ir hacia adelante." }
+                ]
+            },
+            {
+                text: "Para llegar al hospital necesitas cambiar de acera (sidewalk). ¿Qué instrucción usas?",
+                english: "(To reach the hospital you need to change sidewalks. What instruction do you use?)",
+                options: [
+                    { text: "Cruza la calle", correct: true, explain: "¡Muy bien! Cruzar la calle te lleva al otro lado." },
+                    { text: "Gira a la derecha", correct: false, explain: "Girar no significa cambiar de acera necesariamente." },
+                    { text: "Ve recto", correct: false, explain: "Seguir recto mantiene tu misma dirección." }
+                ]
+            },
+            {
+                text: "Quieres ir al supermercado y debes tomar el camino hacia la izquierda ⬅️. ¿Qué dices?",
+                english: "(You want to go to the supermarket and must take the left path ⬅️. What do you say?)",
+                options: [
+                    { text: "Gira a la izquierda", correct: true, explain: "¡Correcto! ⬅️ es girar a la izquierda." },
+                    { text: "Gira a la derecha", correct: false, explain: "Incorrecto. Derecha es ➡️." },
+                    { text: "Sigue derecho", correct: false, explain: "Incorrecto. Izquierda es ⬅️." }
+                ]
+            }
+        ];
+
+        // Variables de Estado de la Aplicación
+        let deck = [];
+        let currentCardIndex = 0;
+        let isCardFlipped = false;
+        let masteredCardsCount = 0;
+
+        let currentGameQuestionIndex = 0;
+        let gameScore = 0;
+
+        // Gestión de Navegación entre Actividades
+        let currentPhaseIndex = 0; // 0: Intro, 1: Flashcards, 2: Game, 3: Results
+        const phases = ['screen-intro', 'screen-flashcards', 'screen-game', 'screen-results'];
+        const phaseTitles = [
+            "Fase 1: Inicio",
+            "Fase 1: Tarjetas Interactivas",
+            "Fase 2: Desafío de Rutas",
+            "Fase 3: Autoevaluación"
+        ];
+
+        // Elementos DOM
+        const screenIntro = document.getElementById('screen-intro');
+        const screenFlashcards = document.getElementById('screen-flashcards');
+        const screenGame = document.getElementById('screen-game');
+        const screenResults = document.getElementById('screen-results');
+        const headerPhaseTag = document.getElementById('header-phase-tag');
+
+        const navBtnPrev = document.getElementById('nav-btn-prev');
+        const navBtnNext = document.getElementById('nav-btn-next');
+
+        function updateNavigationUI() {
+            // Ocultar todas las pantallas
+            phases.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+
+            // Mostrar la pantalla activa
+            const activeScreen = document.getElementById(phases[currentPhaseIndex]);
+            if (activeScreen) activeScreen.classList.remove('hidden');
+
+            // Actualizar etiqueta del encabezado
+            if (headerPhaseTag) {
+                headerPhaseTag.innerText = phaseTitles[currentPhaseIndex];
+            }
+
+            // Actualizar estado de los botones de navegación (Flechas)
+            if (navBtnPrev) navBtnPrev.disabled = (currentPhaseIndex === 0);
+            if (navBtnNext) navBtnNext.disabled = (currentPhaseIndex === phases.length - 1);
+
+            // Actualizar indicadores de puntos (dots)
+            for (let i = 1; i <= 4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (dot) {
+                    if (i - 1 === currentPhaseIndex) {
+                        dot.className = "w-3 h-3 rounded-full bg-cyanBlue transition-all transform scale-125";
+                    } else if (i - 1 < currentPhaseIndex) {
+                        dot.className = "w-3 h-3 rounded-full bg-corpBlue transition-all";
+                    } else {
+                        dot.className = "w-3 h-3 rounded-full bg-slate-300 transition-all";
+                    }
+                }
+            }
+        }
+
+        function navigatePhase(direction) {
+            const newIndex = currentPhaseIndex + direction;
+            if (newIndex >= 0 && newIndex < phases.length) {
+                currentPhaseIndex = newIndex;
+                
+                // Inicializar estados específicos de fase al navegar
+                if (currentPhaseIndex === 1 && deck.length === 0) {
+                    deck = [...flashcardsData];
+                    currentCardIndex = 0;
+                    masteredCardsCount = 0;
+                    renderCard();
+                } else if (currentPhaseIndex === 2 && currentGameQuestionIndex === 0) {
+                    renderGameQuestion();
+                } else if (currentPhaseIndex === 3) {
+                    showResults();
+                }
+
+                updateNavigationUI();
+            }
+        }
+
+        const cardInner = document.getElementById('card-inner');
+        const cardCategory = document.getElementById('card-category');
+        const cardCategoryBack = document.getElementById('card-category-back');
+        const cardIconFront = document.getElementById('card-icon-front');
+        const cardHintFront = document.getElementById('card-hint-front');
+        const cardEnglishHint = document.getElementById('card-english-hint');
+        const cardIconBack = document.getElementById('card-icon-back');
+        const cardWordSpanish = document.getElementById('card-word-spanish');
+        const cardWordEnglish = document.getElementById('card-word-english');
+        const cardSentenceExample = document.getElementById('card-sentence-example');
+
+        const progressBar = document.getElementById('flashcard-progress-bar');
+        const progressText = document.getElementById('flashcard-progress-text');
+        const scoreText = document.getElementById('flashcard-score-text');
+
+        // Inicializar Lección
+        function startLesson() {
+            deck = [...flashcardsData];
+            currentCardIndex = 0;
+            masteredCardsCount = 0;
+            renderCard();
+
+            currentPhaseIndex = 1;
+            updateNavigationUI();
+        }
+
+        // Renderizar Tarjeta Actual
+        function renderCard() {
+            if (deck.length === 0 || currentCardIndex >= deck.length) {
+                // Terminado la fase de flashcards, avanzar automáticamente al juego
+                currentPhaseIndex = 2;
+                startRouteGame();
+                return;
+            }
+
+            // Desvoltear si estaba volteada
+            isCardFlipped = false;
+            cardInner.classList.remove('rotate-y-180');
+
+            const item = deck[currentCardIndex];
+            cardCategory.innerText = item.category;
+            cardCategoryBack.innerText = item.category;
+            cardIconFront.innerText = item.icon;
+            cardIconBack.innerText = item.icon;
+
+            cardWordSpanish.innerText = item.word;
+            cardWordEnglish.innerText = `(${item.english})`;
+            cardSentenceExample.innerText = `"${item.example}"`;
+
+            // Actualizar progreso
+            const totalInitial = flashcardsData.length;
+            const currentNumber = totalInitial - deck.length + 1;
+            progressText.innerText = `Tarjeta ${currentNumber} de ${totalInitial} (Restantes: ${deck.length})`;
+            scoreText.innerText = `Aprendidas: ${masteredCardsCount}`;
+            const percent = Math.min(100, Math.round(((totalInitial - deck.length) / totalInitial) * 100));
+            progressBar.style.width = `${percent}%`;
+        }
+
+        // Voltear tarjeta
+        function flipCard() {
+            isCardFlipped = !isCardFlipped;
+            if (isCardFlipped) {
+                cardInner.classList.add('rotate-y-180');
+            } else {
+                cardInner.classList.remove('rotate-y-180');
+            }
+        }
+
+        // Accesibilidad por Teclado en tarjeta
+        document.getElementById('card-container').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                flipCard();
+            }
+        });
+
+        // Evaluar tarjeta (Spaced Repetition simple)
+        function evaluateCard(isKnow) {
+            const currentItem = deck[currentCardIndex];
+            
+            if (isKnow) {
+                masteredCardsCount++;
+                // Remover del mazo actual
+                deck.splice(currentCardIndex, 1);
+            } else {
+                // Reubicar al final del mazo para repaso posterior
+                const item = deck.splice(currentCardIndex, 1)[0];
+                deck.push(item);
+            }
+
+            // Si el índice supera el límite, volver a 0
+            if (currentCardIndex >= deck.length) {
+                currentCardIndex = 0;
+            }
+
+            renderCard();
+        }
+
+        // Fase 2: Juego de Rutas
+        function startRouteGame() {
+            currentGameQuestionIndex = 0;
+            gameScore = 0;
+            renderGameQuestion();
+            updateNavigationUI();
+        }
+
+        function renderGameQuestion() {
+            const feedbackEl = document.getElementById('game-feedback');
+            feedbackEl.classList.add('hidden');
+            feedbackEl.innerText = '';
+
+            if (currentGameQuestionIndex >= gameQuestions.length) {
+                currentPhaseIndex = 3;
+                showResults();
+                return;
+            }
+
+            const q = gameQuestions[currentGameQuestionIndex];
+            document.getElementById('game-step-badge').innerText = `Reto ${currentGameQuestionIndex + 1}/${gameQuestions.length}`;
+            document.getElementById('game-question-text').innerText = q.text;
+            document.getElementById('game-question-en').innerText = q.english;
+
+            const grid = document.getElementById('game-options-grid');
+            grid.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left bg-white hover:bg-lightBlue border-2 border-slate-200 hover:border-cyanBlue p-4 rounded-xl text-navy font-semibold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-corpBlue flex justify-between items-center";
+                btn.innerHTML = `<span>${opt.text}</span> <span class="text-xs text-slate-400 font-normal">Opción ${idx + 1}</span>`;
+                btn.onclick = () => checkGameAnswer(opt, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkGameAnswer(option, btnElement) {
+            const feedbackEl = document.getElementById('game-feedback');
+            feedbackEl.classList.remove('hidden');
+
+            // Deshabilitar todos los botones temporalmente
+            const allBtns = document.getElementById('game-options-grid').querySelectorAll('button');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (option.correct) {
+                gameScore++;
+                feedbackEl.className = "p-3 rounded-lg text-sm text-center font-medium bg-emerald-100 text-emerald-800 border border-emerald-300";
+                feedbackEl.innerText = option.explain;
+                btnElement.classList.add('border-emerald-500', 'bg-emerald-50');
+            } else {
+                feedbackEl.className = "p-3 rounded-lg text-sm text-center font-medium bg-amber-100 text-amber-800 border border-amber-300";
+                feedbackEl.innerText = option.explain;
+                btnElement.classList.add('border-amber-500', 'bg-amber-50');
+            }
+
+            // Pasar a la siguiente pregunta tras 2.2 segundos
+            setTimeout(() => {
+                currentGameQuestionIndex++;
+                renderGameQuestion();
+            }, 2200);
+        }
+
+        // Fase 3: Pantalla de Resultados
+        function showResults() {
+            document.getElementById('res-cards-score').innerText = "100%";
+            document.getElementById('res-game-score').innerText = `${gameScore}/${gameQuestions.length}`;
+            updateNavigationUI();
+        }
+
+        // Reiniciar Aplicación
+        function resetApp() {
+            currentPhaseIndex = 0;
+            updateNavigationUI();
+        }
+
+        // Inicialización al cargar la ventana
+        window.onload = function() {
+            updateNavigationUI();
+        };
+    </script>
+</body>
+</html>
